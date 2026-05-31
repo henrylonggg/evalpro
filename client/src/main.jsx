@@ -49,7 +49,7 @@ import "./styles.css";
 const API = "https://edge-1-6dtw.onrender.com";
 const CLERK_PUBLISHABLE_KEY = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY;
 
-const STORAGE_KEY = "edge-watchlist-v8";
+const STORAGE_KEY = "eval-pro-watchlist-v1";
 const TERMS_VERSION = "2026-05-30";
 
 function rawScore(v) {
@@ -111,6 +111,51 @@ function compactMoney(v) {
   if (Math.abs(n) >= 1_000_000) return `$${(n / 1_000_000).toFixed(1)}T`;
   if (Math.abs(n) >= 1_000) return `$${(n / 1_000).toFixed(1)}B`;
   return `$${n.toFixed(0)}M`;
+}
+
+function metricRaw(item) {
+  if (item === null || item === undefined) return null;
+  if (typeof item === "object" && "value" in item) return item.value;
+  return item;
+}
+
+function firstMetric(...items) {
+  for (const item of items) {
+    const raw = metricRaw(item);
+    if (raw !== null && raw !== undefined && raw !== "" && !Number.isNaN(Number(raw))) {
+      return item;
+    }
+  }
+  return null;
+}
+
+function percentDisplay(item, digits = 1) {
+  const raw = metricRaw(item);
+  if (raw === null || raw === undefined || Number.isNaN(Number(raw))) return "N/A";
+  const n = Number(raw);
+  const pct = Math.abs(n) <= 1 ? n * 100 : n;
+  const sign = pct > 0 ? "+" : "";
+  return `${sign}${pct.toFixed(digits)}%`;
+}
+
+function percentPointDisplay(item, digits = 1) {
+  const raw = metricRaw(item);
+  if (raw === null || raw === undefined || Number.isNaN(Number(raw))) return "N/A";
+  const n = Number(raw);
+  const points = Math.abs(n) <= 1 ? n * 100 : n;
+  const sign = points > 0 ? "+" : "";
+  return `${sign}${points.toFixed(digits)} pts`;
+}
+
+function perShareMoney(item) {
+  const raw = metricRaw(item);
+  if (raw === null || raw === undefined || Number.isNaN(Number(raw))) return "N/A";
+  return money(raw);
+}
+
+function sourceLabel(item, fallback = "Calculated by Eval Pro") {
+  if (item && typeof item === "object" && item.source) return item.source;
+  return fallback;
 }
 
 function readWatchlist() {
@@ -486,9 +531,9 @@ function App() {
     <main className="app-shell">
       <header className="topbar">
         <div className="brand">
-          <img src="/stock-edge-ai-logo.png" alt="Eval AI logo" />
+          <img src="/stock-edge-ai-logo.png" alt="Eval Pro logo" />
           <div>
-            <h1>Eval</h1>
+            <h1>Eval Pro</h1>
           </div>
         </div>
 
@@ -497,7 +542,7 @@ function App() {
             type="button"
             className="ai-nav-btn"
             onClick={() => setView("assistant")}
-            title="Eval AI Assistant"
+            title="Eval Pro Assistant"
           >
             <BrainCircuit size={23} />
           </button>
@@ -510,8 +555,8 @@ function App() {
             type="button"
             className="plans-nav-btn"
             onClick={() => setView("plans")}
-            aria-label="Eval AI Plans"
-            title="Eval AI Plans"
+            aria-label="Eval Pro Plans"
+            title="Eval Pro Plans"
           >
             <Crown size={20} />
           </button>
@@ -591,67 +636,68 @@ function App() {
 function LandingPage({ onContinue }) {
   const productPoints = [
     {
+      icon: <Crown size={20} />,
+      title: "Pro valuation dashboard",
+      text: "See WACC, intrinsic value, DCF value, and valuation gaps above the main report so the most important Pro insights are impossible to miss.",
+    },
+    {
+      icon: <TrendingUp size={20} />,
+      title: "Stock vs S&P 500 growth",
+      text: "Compare the stock’s 52-week return against SPY to see whether it actually beat the market over the same period.",
+    },
+    {
       icon: <Gauge size={20} />,
-      title: "One simple Eval Score",
-      text: "Type a ticker and get a clean 0–10 score that summarizes the stock’s overall setup.",
-    },
-    {
-      icon: <BarChart3 size={20} />,
-      title: "Breakdowns that make sense",
-      text: "See growth, profitability, financial health, valuation, momentum, and pullback in plain English.",
-    },
-    {
-      icon: <ShieldCheck size={20} />,
-      title: "Risk made easier",
-      text: "Eval AI turns volatility, debt, valuation, and business strength into a quick risk read.",
+      title: "One clear Eval Pro Score",
+      text: "Type a ticker and get a clean 0–10 score that summarizes business quality, valuation, momentum, risk, and pullback setup.",
     },
     {
       icon: <BrainCircuit size={20} />,
-      title: "Ask questions instantly*",
-      text: "Ask the assistant to compare stocks, explain metrics, and translate market data into clear, beginner-friendly answers.",
+      title: "Plain-English Pro explanations",
+      text: "Use the assistant and metric breakdowns to understand what the numbers mean without digging through confusing finance reports.",
     },
   ];
 
   return (
-    <main className="landing-page">
+    <main className="landing-page pro-landing-page">
       <div className="landing-orb landing-orb-one" />
       <div className="landing-orb landing-orb-two" />
       <div className="landing-grid-glow" />
 
-      <section className="landing-shell">
+      <section className="landing-shell pro-landing-shell">
         <div className="landing-brand-row">
-          <img src="/stock-edge-ai-logo.png" alt="Eval AI logo" />
+          <img src="/stock-edge-ai-logo.png" alt="Eval Pro logo" />
           <div>
-            <h1>Eval</h1>
+            <h1>Eval Pro</h1>
+            <span>Advanced stock intelligence</span>
           </div>
         </div>
 
-        <div className="landing-hero">
+        <div className="landing-hero pro-landing-hero">
           <div className="landing-copy">
             <div className="landing-kicker">
-              <Sparkles size={16} /> Built for faster stock decisions
+              <Crown size={16} /> Pro plan stock research dashboard
             </div>
 
-            <h2>Turn complicated stock data into one clear answer.</h2>
+            <h2>Deeper valuation tools. Cleaner decisions. Faster stock research.</h2>
 
             <p>
-              Eval AI helps users understand stocks without digging through confusing
-              spreadsheets, finance terms, or long reports. Enter any ticker to get a
-              simple Eval Score, risk rating, company summary, key metrics, watchlist,
-              and plain-English explanations designed to be quick, readable, and useful.
+              Eval Pro is the upgraded version of Eval built for users who want more than
+              a basic stock score. It keeps the same futuristic theme, but adds a more
+              professional research layout with WACC, intrinsic value, DCF value, market
+              outperformance, core financial metrics, watchlist tracking, and simple explanations.
             </p>
 
             <div className="landing-actions">
               <button type="button" className="landing-continue-btn" onClick={onContinue}>
-                Continue <ArrowRight size={20} />
+                Enter Eval Pro <ArrowRight size={20} />
               </button>
-              <span>Open the dashboard and start analyzing stocks.</span>
+              <span>Open the Pro dashboard and start analyzing stocks.</span>
             </div>
           </div>
 
-          <div className="landing-score-preview" aria-label="Eval AI preview card">
+          <div className="landing-score-preview pro-preview-card" aria-label="Eval Pro preview card">
             <div className="preview-topline">
-              <span>Live-style report preview</span>
+              <span>Pro report preview</span>
               <b>NVDA</b>
             </div>
 
@@ -659,10 +705,10 @@ function LandingPage({ onContinue }) {
               <strong>9.0</strong>
             </div>
 
-            <div className="preview-bars">
-              <div><span>Profitability</span><b style={{ width: "92%" }} /></div>
-              <div><span>Financial Health</span><b style={{ width: "81%" }} /></div>
-              <div><span>Momentum</span><b style={{ width: "74%" }} /></div>
+            <div className="pro-preview-metrics">
+              <div><span>WACC</span><b>8.7%</b></div>
+              <div><span>DCF Value</span><b>$142.30</b></div>
+              <div><span>Vs S&P 500</span><b>+22.4 pts</b></div>
             </div>
           </div>
         </div>
@@ -677,16 +723,17 @@ function LandingPage({ onContinue }) {
           ))}
         </div>
 
-        <div className="landing-bottom-strip">
-          <span>Eval Score</span>
-          <span>Risk Rating</span>
-          <span>Company Breakdown</span>
+        <div className="landing-bottom-strip pro-bottom-strip">
+          <span>WACC</span>
+          <span>Intrinsic Value</span>
+          <span>DCF Value</span>
+          <span>Stock vs SPY</span>
+          <span>Eval Pro Score</span>
           <span>Watchlist</span>
-          <span>AI Assistant</span>
         </div>
 
         <p className="landing-footnote">
-          *Eval AI provides educational explanations only and is not financial advice.
+          Eval Pro provides educational explanations only and is not financial advice.
         </p>
       </section>
     </main>
@@ -754,9 +801,9 @@ function ClerkAccessPage({ onBack, onSuccess }) {
           </button>
 
           <div className="clerk-access-brand">
-            <img src="/stock-edge-ai-logo.png" alt="Eval logo" />
+            <img src="/stock-edge-ai-logo.png" alt="Eval Pro logo" />
             <div>
-              <h1>Eval</h1>
+              <h1>Eval Pro</h1>
               <p>Secure account access</p>
             </div>
           </div>
@@ -783,7 +830,7 @@ function ClerkAccessPage({ onBack, onSuccess }) {
           <section className="clerk-access-card">
             <SignedOut>
               <div className="clerk-access-topline">
-                <span>{mode === "signIn" ? "Welcome back" : "Create your Eval account"}</span>
+                <span>{mode === "signIn" ? "Welcome back" : "Create your Eval Pro account"}</span>
                 <h3>{mode === "signIn" ? "Sign in to continue." : "Sign up to get started."}</h3>
               </div>
 
@@ -828,7 +875,7 @@ function ClerkAccessPage({ onBack, onSuccess }) {
                 </div>
                 <span>Signed in</span>
                 <h3>Your account is ready.</h3>
-                <p>Continue to Eval and start analyzing stocks.</p>
+                <p>Continue to Eval Pro and start analyzing stocks.</p>
                 <button type="button" className="auth-submit-btn" onClick={onSuccess}>
                   Continue to dashboard <ArrowRight size={18} />
                 </button>
@@ -885,7 +932,7 @@ function SupportContactPage({ onBack, onHome, onTerms }) {
             <div className="support-kicker">
               <MessageCircle size={16} /> Support & Contact
             </div>
-            <h1>Need help with Eval?</h1>
+            <h1>Need help with Eval Pro?</h1>
             <p>
               Reach out with account questions, login issues, dashboard problems, billing
               questions, feature requests, or general feedback. Emails and direct messages are
@@ -929,14 +976,14 @@ function SupportContactPage({ onBack, onHome, onTerms }) {
             <ShieldCheck size={22} />
             <h3>What to include</h3>
             <p>
-              Send the email used for your Eval account, what page you were on, what button or
+              Send the email used for your Eval Pro account, what page you were on, what button or
               ticker caused the issue, and any error message you saw. Do not send passwords.
             </p>
           </article>
         </div>
 
         <div className="support-note">
-          Eval is an educational stock-analysis tool. Support can help with product access,
+          Eval Pro is an educational stock-analysis tool. Support can help with product access,
           account issues, and app problems, but cannot provide personalized financial advice.
         </div>
       </section>
@@ -953,38 +1000,38 @@ function TermsPage({ onAgree, onBack, requireAgreement = true }) {
     {
       title: "1. Acceptance of these Terms",
       text: [
-        "These Terms and Conditions govern your access to and use of Eval, including the website, dashboard, Eval Score, risk rating, watchlist, AI assistant, company summaries, key metrics, charts, explanations, paid plan pages, and any related content or features. By creating an account, signing in, clicking I Agree, or using Eval, you agree to these Terms.",
-        "If you do not agree, do not use Eval. If you use Eval on behalf of a company, club, organization, partnership, or other entity, you represent that you have authority to bind that entity to these Terms."
+        "These Terms and Conditions govern your access to and use of Eval Pro, including the website, dashboard, Eval Pro Score, risk rating, watchlist, AI assistant, company summaries, key metrics, charts, explanations, paid plan pages, and any related content or features. By creating an account, signing in, clicking I Agree, or using Eval Pro, you agree to these Terms.",
+        "If you do not agree, do not use Eval Pro. If you use Eval Pro on behalf of a company, club, organization, partnership, or other entity, you represent that you have authority to bind that entity to these Terms."
       ],
     },
     {
       title: "2. Educational information only — no investment advice",
       text: [
-        "Eval is an educational stock research and data-organization tool. Eval is not a registered investment adviser, financial adviser, broker-dealer, securities dealer, tax adviser, legal adviser, accountant, investment bank, portfolio manager, fiduciary, or trading platform.",
-        "Nothing on Eval is personalized investment advice, financial advice, trading advice, tax advice, legal advice, accounting advice, a recommendation, an offer, a solicitation, or a promise to buy, sell, hold, short, trade, or otherwise transact in any security, ETF, option, cryptocurrency, futures contract, index, fund, financial product, or investment strategy.",
-        "Eval does not consider your investment objectives, net worth, risk tolerance, income, debts, taxes, time horizon, portfolio, personal circumstances, or suitability. You are solely responsible for your own investment decisions and should consult a qualified licensed professional before making financial decisions."
+        "Eval Pro is an educational stock research and data-organization tool. Eval Pro is not a registered investment adviser, financial adviser, broker-dealer, securities dealer, tax adviser, legal adviser, accountant, investment bank, portfolio manager, fiduciary, or trading platform.",
+        "Nothing on Eval Pro is personalized investment advice, financial advice, trading advice, tax advice, legal advice, accounting advice, a recommendation, an offer, a solicitation, or a promise to buy, sell, hold, short, trade, or otherwise transact in any security, ETF, option, cryptocurrency, futures contract, index, fund, financial product, or investment strategy.",
+        "Eval Pro does not consider your investment objectives, net worth, risk tolerance, income, debts, taxes, time horizon, portfolio, personal circumstances, or suitability. You are solely responsible for your own investment decisions and should consult a qualified licensed professional before making financial decisions."
       ],
     },
     {
       title: "3. No guarantees, no reliance, and market risk",
       text: [
         "Investing and trading involve risk, including loss of principal. Securities and markets can move quickly and unpredictably. Past performance, historical data, backtests, analyst opinions, valuation models, ratings, grades, metrics, scores, or AI-generated explanations do not guarantee future results.",
-        "Eval Scores, risk ratings, grades, company summaries, pullback readings, momentum readings, valuation readings, and AI answers are simplified educational outputs. They may be incomplete, delayed, inaccurate, misinterpreted, unavailable, or inappropriate for your situation. Do not rely on Eval as the only basis for an investment decision.",
-        "You agree that your use of Eval is at your own risk and that you are responsible for independently verifying all information before acting on it."
+        "Eval Pro Scores, risk ratings, grades, company summaries, pullback readings, momentum readings, valuation readings, and AI answers are simplified educational outputs. They may be incomplete, delayed, inaccurate, misinterpreted, unavailable, or inappropriate for your situation. Do not rely on Eval Pro as the only basis for an investment decision.",
+        "You agree that your use of Eval Pro is at your own risk and that you are responsible for independently verifying all information before acting on it."
       ],
     },
     {
       title: "4. Data sources, calculations, and third-party information",
       text: [
-        "Eval may use market data, company data, financial statements, ratios, profile information, news information, AI responses, and other data from third-party providers, public sources, APIs, company websites, and user inputs. Eval does not guarantee that data is accurate, complete, current, uninterrupted, or error-free.",
+        "Eval Pro may use market data, company data, financial statements, ratios, profile information, news information, AI responses, and other data from third-party providers, public sources, APIs, company websites, and user inputs. Eval Pro does not guarantee that data is accurate, complete, current, uninterrupted, or error-free.",
         "Financial metrics may be missing, stale, restated, estimated, calculated differently by different providers, or affected by stock splits, corporate actions, accounting methods, API limits, provider outages, caching, formatting issues, or data-entry errors.",
-        "Eval may modify, remove, reorder, or change metrics, score weights, formulas, plans, features, explanations, provider integrations, or availability at any time without notice."
+        "Eval Pro may modify, remove, reorder, or change metrics, score weights, formulas, plans, features, explanations, provider integrations, or availability at any time without notice."
       ],
     },
     {
       title: "5. AI assistant and automated explanations",
       text: [
-        "Eval may include AI-generated summaries, explanations, comparisons, interpretations, and answers. AI can be wrong, outdated, incomplete, overly confident, or misleading. AI responses are for educational use only and are not professional advice.",
+        "Eval Pro may include AI-generated summaries, explanations, comparisons, interpretations, and answers. AI can be wrong, outdated, incomplete, overly confident, or misleading. AI responses are for educational use only and are not professional advice.",
         "You agree not to treat any AI output as a command, recommendation, guarantee, or substitute for your own research or a licensed professional. You should verify AI output with reliable independent sources before using it."
       ],
     },
@@ -992,71 +1039,71 @@ function TermsPage({ onAgree, onBack, requireAgreement = true }) {
       title: "6. Accounts, security, and acceptable use",
       text: [
         "You are responsible for maintaining the confidentiality of your account credentials and for all activity that occurs under your account. You agree to provide accurate account information and to keep it updated.",
-        "You may not scrape, copy, resell, overload, attack, reverse engineer, bypass authentication, bypass rate limits, interfere with security, use bots, create fake accounts, share accounts to avoid payment, or use Eval for unlawful, abusive, fraudulent, or harmful purposes.",
-        "Eval may suspend, restrict, or terminate access at any time if misuse, suspicious activity, payment issues, legal risk, security risk, API abuse, or violation of these Terms is suspected."
+        "You may not scrape, copy, resell, overload, attack, reverse engineer, bypass authentication, bypass rate limits, interfere with security, use bots, create fake accounts, share accounts to avoid payment, or use Eval Pro for unlawful, abusive, fraudulent, or harmful purposes.",
+        "Eval Pro may suspend, restrict, or terminate access at any time if misuse, suspicious activity, payment issues, legal risk, security risk, API abuse, or violation of these Terms is suspected."
       ],
     },
     {
       title: "7. Subscriptions, payments, and plan changes",
       text: [
         "Paid plans, pricing, features, limits, trials, and billing terms may change over time. Unless otherwise stated at checkout, subscription fees are billed in advance and may be recurring. You are responsible for reviewing the price, renewal period, and cancellation terms before purchasing.",
-        "Eval may add, remove, or modify features included in free or paid plans. A feature described on a plan page may depend on third-party APIs, market data providers, AI providers, payment providers, or backend availability."
+        "Eval Pro may add, remove, or modify features included in free or paid plans. A feature described on a plan page may depend on third-party APIs, market data providers, AI providers, payment providers, or backend availability."
       ],
     },
     {
       title: "8. Intellectual property and license",
       text: [
-        "Eval, including its design, interface, branding, scoring structure, explanations, code, layout, text, graphics, and features, is owned by Eval or its licensors and is protected by intellectual-property laws. You receive a limited, revocable, non-exclusive, non-transferable license to use Eval for personal, non-commercial educational research unless a separate written agreement says otherwise.",
-        "You may not copy, modify, distribute, sell, sublicense, frame, mirror, or create derivative works from Eval without written permission."
+        "Eval Pro, including its design, interface, branding, scoring structure, explanations, code, layout, text, graphics, and features, is owned by Eval Pro or its licensors and is protected by intellectual-property laws. You receive a limited, revocable, non-exclusive, non-transferable license to use Eval Pro for personal, non-commercial educational research unless a separate written agreement says otherwise.",
+        "You may not copy, modify, distribute, sell, sublicense, frame, mirror, or create derivative works from Eval Pro without written permission."
       ],
     },
     {
       title: "9. User content and feedback",
       text: [
-        "If you submit questions, ticker lists, feedback, suggestions, messages, or other content, you represent that you have the right to submit it and that it does not violate law or third-party rights. You grant Eval a license to use that content to operate, improve, secure, and support the service.",
+        "If you submit questions, ticker lists, feedback, suggestions, messages, or other content, you represent that you have the right to submit it and that it does not violate law or third-party rights. You grant Eval Pro a license to use that content to operate, improve, secure, and support the service.",
         "Do not submit confidential, regulated, illegal, harmful, or sensitive information that you do not want processed by the service."
       ],
     },
     {
       title: "10. Privacy and communications",
       text: [
-        "Eval may process account information, usage information, device information, authentication information, and submitted content to operate the service, improve features, prevent abuse, communicate with users, and comply with legal obligations. Third-party services such as authentication, hosting, analytics, payment, email, AI, market-data, and security providers may process information as needed to provide the service.",
-        "By using Eval, you consent to receiving service-related emails such as account verification, password reset, security notices, plan notices, legal notices, and important product updates."
+        "Eval Pro may process account information, usage information, device information, authentication information, and submitted content to operate the service, improve features, prevent abuse, communicate with users, and comply with legal obligations. Third-party services such as authentication, hosting, analytics, payment, email, AI, market-data, and security providers may process information as needed to provide the service.",
+        "By using Eval Pro, you consent to receiving service-related emails such as account verification, password reset, security notices, plan notices, legal notices, and important product updates."
       ],
     },
     {
       title: "11. Third-party services and links",
       text: [
-        "Eval may link to or integrate with third-party websites, APIs, data providers, payment providers, authentication providers, AI providers, company websites, brokers, or news sources. Eval does not control third-party services and is not responsible for their content, availability, accuracy, policies, fees, outages, or actions.",
+        "Eval Pro may link to or integrate with third-party websites, APIs, data providers, payment providers, authentication providers, AI providers, company websites, brokers, or news sources. Eval Pro does not control third-party services and is not responsible for their content, availability, accuracy, policies, fees, outages, or actions.",
         "Your use of third-party services may be governed by their own terms and privacy policies."
       ],
     },
     {
       title: "12. Disclaimers of warranties",
       text: [
-        "Eval is provided on an AS IS and AS AVAILABLE basis. To the maximum extent permitted by law, Eval disclaims all warranties, express, implied, statutory, or otherwise, including warranties of accuracy, completeness, timeliness, merchantability, fitness for a particular purpose, title, non-infringement, availability, security, and uninterrupted operation.",
-        "Eval does not warrant that the service will be error-free, secure, uninterrupted, profitable, accurate, compatible with your needs, or free from harmful components."
+        "Eval Pro is provided on an AS IS and AS AVAILABLE basis. To the maximum extent permitted by law, Eval Pro disclaims all warranties, express, implied, statutory, or otherwise, including warranties of accuracy, completeness, timeliness, merchantability, fitness for a particular purpose, title, non-infringement, availability, security, and uninterrupted operation.",
+        "Eval Pro does not warrant that the service will be error-free, secure, uninterrupted, profitable, accurate, compatible with your needs, or free from harmful components."
       ],
     },
     {
       title: "13. Limitation of liability",
       text: [
-        "To the maximum extent permitted by law, Eval and its owners, operators, affiliates, contractors, providers, and licensors will not be liable for indirect, incidental, consequential, special, exemplary, punitive, lost-profit, lost-revenue, lost-data, trading-loss, investment-loss, business-interruption, reputational, or reliance damages, even if advised of the possibility of such damages.",
-        "To the maximum extent permitted by law, Eval’s total liability for any claim arising out of or relating to the service or these Terms will not exceed the greater of the amount you paid to Eval for the service during the three months before the claim arose or one hundred U.S. dollars. Some jurisdictions do not allow certain limitations, so some limitations may not apply to you."
+        "To the maximum extent permitted by law, Eval Pro and its owners, operators, affiliates, contractors, providers, and licensors will not be liable for indirect, incidental, consequential, special, exemplary, punitive, lost-profit, lost-revenue, lost-data, trading-loss, investment-loss, business-interruption, reputational, or reliance damages, even if advised of the possibility of such damages.",
+        "To the maximum extent permitted by law, Eval Pro’s total liability for any claim arising out of or relating to the service or these Terms will not exceed the greater of the amount you paid to Eval Pro for the service during the three months before the claim arose or one hundred U.S. dollars. Some jurisdictions do not allow certain limitations, so some limitations may not apply to you."
       ],
     },
     {
       title: "14. Indemnification",
       text: [
-        "You agree to defend, indemnify, and hold harmless Eval and its owners, operators, affiliates, contractors, providers, and licensors from and against claims, damages, losses, liabilities, costs, and expenses, including reasonable attorneys’ fees, arising out of or related to your use of Eval, your investment decisions, your violation of these Terms, your violation of law, your user content, your misuse of data, or your infringement of rights."
+        "You agree to defend, indemnify, and hold harmless Eval Pro and its owners, operators, affiliates, contractors, providers, and licensors from and against claims, damages, losses, liabilities, costs, and expenses, including reasonable attorneys’ fees, arising out of or related to your use of Eval Pro, your investment decisions, your violation of these Terms, your violation of law, your user content, your misuse of data, or your infringement of rights."
       ],
     },
     {
       title: "15. Arbitration agreement and class-action waiver",
       text: [
-        "PLEASE READ THIS SECTION CAREFULLY. To the maximum extent permitted by law, you and Eval agree that any dispute, claim, or controversy arising out of or relating to these Terms, Eval, your account, your subscription, your use of the service, data, scores, AI outputs, or any relationship between you and Eval will be resolved by binding individual arbitration rather than in court, except that either party may bring an individual claim in small-claims court if eligible.",
-        "The arbitration will be conducted on an individual basis. You and Eval waive the right to a jury trial and waive the right to participate in a class action, class arbitration, consolidated action, representative action, private attorney general action, or any proceeding brought on behalf of other users or the general public. The arbitrator may award relief only to the individual party seeking relief and only to the extent necessary to resolve that individual party’s claim.",
-        "Before starting arbitration, the party seeking relief must send written notice describing the dispute and requested relief. The parties will try in good faith to resolve the dispute informally for at least 30 days. If the dispute is not resolved, either party may start arbitration under the rules of a recognized arbitration provider selected by Eval unless applicable law requires otherwise.",
+        "PLEASE READ THIS SECTION CAREFULLY. To the maximum extent permitted by law, you and Eval Pro agree that any dispute, claim, or controversy arising out of or relating to these Terms, Eval Pro, your account, your subscription, your use of the service, data, scores, AI outputs, or any relationship between you and Eval Pro will be resolved by binding individual arbitration rather than in court, except that either party may bring an individual claim in small-claims court if eligible.",
+        "The arbitration will be conducted on an individual basis. You and Eval Pro waive the right to a jury trial and waive the right to participate in a class action, class arbitration, consolidated action, representative action, private attorney general action, or any proceeding brought on behalf of other users or the general public. The arbitrator may award relief only to the individual party seeking relief and only to the extent necessary to resolve that individual party’s claim.",
+        "Before starting arbitration, the party seeking relief must send written notice describing the dispute and requested relief. The parties will try in good faith to resolve the dispute informally for at least 30 days. If the dispute is not resolved, either party may start arbitration under the rules of a recognized arbitration provider selected by Eval Pro unless applicable law requires otherwise.",
         "If any part of this arbitration or class-action waiver section is found unenforceable, the unenforceable part will be severed to the extent permitted by law, and the remaining terms will continue in effect. If the class-action waiver is found unenforceable for a claim, that claim must proceed in court and not in arbitration."
       ],
       important: true,
@@ -1068,15 +1115,15 @@ function TermsPage({ onAgree, onBack, requireAgreement = true }) {
       ],
     },
     {
-      title: "17. Changes to Eval and these Terms",
+      title: "17. Changes to Eval Pro and these Terms",
       text: [
-        "Eval may update these Terms from time to time. Material changes may be shown in the app, emailed, or posted on the website. Continued use of Eval after changes become effective means you accept the updated Terms. If you do not agree to the updated Terms, stop using Eval."
+        "Eval Pro may update these Terms from time to time. Material changes may be shown in the app, emailed, or posted on the website. Continued use of Eval Pro after changes become effective means you accept the updated Terms. If you do not agree to the updated Terms, stop using Eval Pro."
       ],
     },
     {
       title: "18. Contact and legal notices",
       text: [
-        "Questions, support requests, or legal notices should be sent through the contact method provided by Eval. If no separate contact method is available, use the account email or support channel associated with the service."
+        "Questions, support requests, or legal notices should be sent through the contact method provided by Eval Pro. If no separate contact method is available, use the account email or support channel associated with the service."
       ],
     },
   ];
@@ -1090,13 +1137,13 @@ function TermsPage({ onAgree, onBack, requireAgreement = true }) {
         <div className="terms-hero">
           <div>
             <div className="terms-kicker">
-              <Scale size={16} /> Required before entering Eval
+              <Scale size={16} /> Required before entering Eval Pro
             </div>
             <h1>Terms and Conditions</h1>
             <p>
               {requireAgreement
                 ? "Review and accept these terms before using the dashboard. This page is designed for a stock-analysis education product, with extra focus on market-risk disclaimers, no-advice language, liability limits, and arbitration."
-                : "Review the current Eval Terms and Conditions at any time from your dashboard."}
+                : "Review the current Eval Pro Terms and Conditions at any time from your dashboard."}
             </p>
           </div>
 
@@ -1147,7 +1194,7 @@ function TermsPage({ onAgree, onBack, requireAgreement = true }) {
                 onChange={(e) => setChecked(e.target.checked)}
               />
               <span>
-                I have read and agree to the Eval Terms and Conditions, including the
+                I have read and agree to the Eval Pro Terms and Conditions, including the
                 no-investment-advice disclaimer, limitation of liability, arbitration agreement,
                 and class-action waiver.
               </span>
@@ -1238,7 +1285,7 @@ function Watchlist({
       <div className="watch-list">
         {items.length === 0 ? (
           <div className="watch-empty">
-            Add stocks here to compare their 0.0–10.0 Eval Scores.
+            Add stocks here to compare their 0.0–10.0 Eval Pro Scores.
           </div>
         ) : (
           items.map((item) => (
@@ -1276,14 +1323,15 @@ function PlansPage({ onBack }) {
     description:
       "One upgraded plan that combines deeper fundamentals, smarter valuation tools, news sentiment, and expanded AI explanations in one simple package.",
     features: [
-      "Expanded Eval Score with more quality fundamentals",
+      "Expanded Eval Pro Score with more quality fundamentals",
       "EBIT, EBITDA, cash-flow, and balance-sheet metrics",
       "Intrinsic value, WACC, and DCF-style valuation support",
+      "Stock vs S&P 500 52-week growth difference",
       "Margin of safety and percent difference from intrinsic value",
       "News sentiment score from recent company headlines",
       "AI summaries that explain what the news means",
       "More detailed metric explanations in plain English",
-      "Expanded Eval AI Assistant access for stock questions",
+      "Expanded Eval Pro Assistant access for stock questions",
     ],
   };
 
@@ -1435,7 +1483,7 @@ function AssistantPage({ current, watchlist, onBack }) {
 
           <div>
             <div className="assistant-kicker">
-              <BrainCircuit size={16} /> Eval AI Assistant
+              <BrainCircuit size={16} /> Eval Pro Assistant
             </div>
             <h2>Ask stock questions in plain English.</h2>
             <p>
@@ -1449,14 +1497,14 @@ function AssistantPage({ current, watchlist, onBack }) {
           <div className="chat-messages">
             {messages.map((msg, index) => (
               <div className={`chat-bubble ${msg.role}`} key={`${msg.role}-${index}`}>
-                <span>{msg.role === "user" ? "You" : "Eval AI"}</span>
+                <span>{msg.role === "user" ? "You" : "Eval Pro"}</span>
                 <p>{msg.content}</p>
               </div>
             ))}
 
             {loading && (
               <div className="chat-bubble assistant">
-                <span>Eval AI</span>
+                <span>Eval Pro</span>
                 <p>Thinking through that question...</p>
               </div>
             )}
@@ -1478,7 +1526,7 @@ function AssistantPage({ current, watchlist, onBack }) {
         </div>
 
         <p className="fineprint center">
-          Educational only. Eval AI Assistant helps explain investing ideas, but it
+          Educational only. Eval Pro Assistant helps explain investing ideas, but it
           is not a licensed financial advisor.
         </p>
       </div>
@@ -1557,6 +1605,9 @@ function Report({ data, onAdd }) {
       metricLine("Price-to-Cash-Flow", metrics.priceToCashFlow),
       metricLine("Price-to-Free-Cash-Flow", metrics.priceToFreeCashFlow),
       metricLine("Enterprise Value", metrics.enterpriseValue),
+      metricLine("WACC", firstMetric(metrics.wacc, metrics.waccPercent, data?.valuation?.wacc)),
+      metricLine("Intrinsic Value", firstMetric(metrics.intrinsicValue, metrics.intrinsicValuePerShare, data?.valuation?.intrinsicValue)),
+      metricLine("DCF Value", firstMetric(metrics.dcfValue, metrics.dcfValuePerShare, metrics.discountedCashFlowValue, data?.valuation?.dcfValue)),
       metricLine("Dividend Yield", metrics.dividendYield),
     ],
     momentum: [
@@ -1625,6 +1676,26 @@ function Report({ data, onAdd }) {
       "Company value estimate calculated as market cap plus total debt minus cash.",
     ],
     [
+      "WACC",
+      firstMetric(metrics.wacc, metrics.waccPercent, data?.valuation?.wacc),
+      "Weighted average cost of capital. It is used as a discount-rate baseline for valuation work.",
+    ],
+    [
+      "Intrinsic Value",
+      firstMetric(metrics.intrinsicValue, metrics.intrinsicValuePerShare, data?.valuation?.intrinsicValue),
+      "Estimated fair value per share from available fundamentals and assumptions.",
+    ],
+    [
+      "DCF Value",
+      firstMetric(metrics.dcfValue, metrics.dcfValuePerShare, metrics.discountedCashFlowValue, data?.valuation?.dcfValue),
+      "Discounted cash-flow estimate per share.",
+    ],
+    [
+      "52W vs S&P 500",
+      firstMetric(metrics.growthVsSpy52Week, metrics.stockVsSpy52WeekGrowthDifference, metrics.priceReturn52WeekVsSpy, data?.valuation?.growthVsSpy52Week),
+      "Stock 52-week return minus SPY 52-week return, shown in percentage points.",
+    ],
+    [
       "52-Week Return",
       metrics.priceReturn52Week,
       "Shows longer-term price momentum over the last year.",
@@ -1636,8 +1707,60 @@ function Report({ data, onAdd }) {
     ],
   ];
 
+  const proMetrics = [
+    {
+      label: "WACC",
+      value: percentDisplay(firstMetric(metrics.wacc, metrics.waccPercent, data?.valuation?.wacc)),
+      note: "Weighted average cost of capital used as the discount-rate baseline for valuation.",
+      source: sourceLabel(firstMetric(metrics.wacc, metrics.waccPercent, data?.valuation?.wacc)),
+      tone: "cyan",
+    },
+    {
+      label: "Intrinsic Value",
+      value: perShareMoney(firstMetric(metrics.intrinsicValue, metrics.intrinsicValuePerShare, data?.valuation?.intrinsicValue)),
+      note: "Estimated fair value per share from available fundamentals and valuation assumptions.",
+      source: sourceLabel(firstMetric(metrics.intrinsicValue, metrics.intrinsicValuePerShare, data?.valuation?.intrinsicValue)),
+      tone: "gold",
+    },
+    {
+      label: "DCF Value",
+      value: perShareMoney(firstMetric(metrics.dcfValue, metrics.dcfValuePerShare, metrics.discountedCashFlowValue, data?.valuation?.dcfValue)),
+      note: "Discounted cash-flow estimate based on projected cash flow and discount-rate inputs.",
+      source: sourceLabel(firstMetric(metrics.dcfValue, metrics.dcfValuePerShare, metrics.discountedCashFlowValue, data?.valuation?.dcfValue)),
+      tone: "purple",
+    },
+    {
+      label: "52W vs S&P 500",
+      value: percentPointDisplay(firstMetric(metrics.growthVsSpy52Week, metrics.stockVsSpy52WeekGrowthDifference, metrics.priceReturn52WeekVsSpy, data?.valuation?.growthVsSpy52Week)),
+      note: "Stock 52-week return minus SPY 52-week return, shown in percentage points.",
+      source: sourceLabel(firstMetric(metrics.growthVsSpy52Week, metrics.stockVsSpy52WeekGrowthDifference, metrics.priceReturn52WeekVsSpy, data?.valuation?.growthVsSpy52Week)),
+      tone: "green",
+    },
+  ];
+
   return (
     <>
+      <section className="pro-metrics-card">
+        <div className="pro-metrics-head">
+          <div>
+            <div className="section-title"><Crown size={17} /> Eval Pro insights</div>
+            <h3>Advanced valuation snapshot</h3>
+          </div>
+          <span>Displayed when the backend returns the required data</span>
+        </div>
+
+        <div className="pro-metric-grid">
+          {proMetrics.map((metric) => (
+            <article className={`pro-metric-tile ${metric.tone}`} key={metric.label}>
+              <span>{metric.label}</span>
+              <strong>{metric.value}</strong>
+              <p>{metric.note}</p>
+              <small>{metric.source}</small>
+            </article>
+          ))}
+        </div>
+      </section>
+
       <section className={`hero-card ${openScoreHelp === "score" ? "score-popup-active" : ""}`}>
         <div className="score-panel">
           <div
@@ -1645,7 +1768,7 @@ function Report({ data, onAdd }) {
             style={{ "--score-angle": `${(edge || 0) * 36}deg` }}
           >
             <div className="score-core">
-              <span>EVAL SCORE</span>
+              <span>EVAL PRO SCORE</span>
               <strong>{scoreText(edge)}</strong>
             </div>
           </div>
@@ -1655,8 +1778,8 @@ function Report({ data, onAdd }) {
               type="button"
               className="score-help-btn score-main-help-btn"
               onClick={() => setOpenScoreHelp(openScoreHelp === "score" ? null : "score")}
-              aria-label="Explain Eval Score color"
-              title="Explain Eval Score color"
+              aria-label="Explain Eval Pro Score color"
+              title="Explain Eval Pro Score color"
             >
               <span className="info-letter">?</span>
             </button>
@@ -1954,7 +2077,7 @@ function LoadingScreen() {
     <main className="loading-screen">
       <div className="loading-card">
         <RefreshCw className="spin" size={22} />
-        <span>Loading Eval...</span>
+        <span>Loading Eval Pro...</span>
       </div>
     </main>
   );
