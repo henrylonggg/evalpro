@@ -4665,3 +4665,276 @@ button:active,
 .summary-grid-single {
   grid-template-columns: 1fr;
 }
+
+/* =========================================================
+   EVAL PRO FRONTEND UPGRADE
+   Premium homepage + top Pro valuation metric cards
+========================================================= */
+
+.brand h1,
+.landing-brand-row h1,
+.clerk-access-brand h1 {
+  white-space: nowrap;
+}
+
+.brand h1 {
+  font-size: clamp(54px, 6vw, 92px);
+  letter-spacing: -4.2px;
+}
+
+.brand::after {
+  content: "PRO";
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: -8px;
+  padding: 8px 11px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 900;
+  letter-spacing: .14em;
+  color: #201200;
+  background: linear-gradient(135deg, #fff4ad, var(--gold), var(--gold-strong));
+  box-shadow: 0 0 26px rgba(255,214,107,.38);
+}
+
+.pro-metrics-card {
+  position: relative;
+  overflow: hidden;
+  border: 1px solid rgba(255,255,255,.14);
+  background:
+    radial-gradient(circle at 8% 0%, rgba(255,214,107,.16), transparent 32%),
+    radial-gradient(circle at 86% 14%, rgba(21,231,255,.14), transparent 34%),
+    radial-gradient(circle at 58% 110%, rgba(159,92,255,.18), transparent 38%),
+    linear-gradient(145deg, rgba(255,255,255,.105), rgba(255,255,255,.052));
+  backdrop-filter: blur(22px);
+  border-radius: 30px;
+  padding: 23px;
+  box-shadow:
+    0 28px 80px rgba(0,0,0,.38),
+    inset 0 1px 0 rgba(255,255,255,.12);
+}
+
+.pro-metrics-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(120deg, rgba(255,255,255,.12), transparent 24%, transparent 74%, rgba(255,255,255,.04));
+}
+
+.pro-metrics-card > * {
+  position: relative;
+  z-index: 1;
+}
+
+.pro-metrics-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 18px;
+  margin-bottom: 18px;
+}
+
+.pro-metrics-head h3 {
+  margin: 9px 0 0;
+  color: #ffffff;
+  font-size: clamp(24px, 3vw, 38px);
+  line-height: .95;
+  letter-spacing: -1.5px;
+  font-weight: 900;
+}
+
+.pro-metrics-head > span {
+  color: rgba(248,251,255,.58);
+  font-size: 12px;
+  font-weight: 750;
+  text-align: right;
+  max-width: 260px;
+  line-height: 1.45;
+}
+
+.pro-metric-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 13px;
+}
+
+.pro-metric-tile {
+  min-height: 182px;
+  position: relative;
+  overflow: hidden;
+  padding: 17px;
+  border-radius: 24px;
+  border: 1px solid rgba(255,255,255,.125);
+  background:
+    radial-gradient(circle at 30% 0%, var(--pro-glow), transparent 44%),
+    rgba(0,0,0,.21);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.08),
+    0 18px 38px rgba(0,0,0,.24);
+}
+
+.pro-metric-tile::after {
+  content: "";
+  position: absolute;
+  inset: auto 15px 0 15px;
+  height: 2px;
+  border-radius: 999px;
+  background: var(--pro-line);
+  box-shadow: 0 0 22px var(--pro-glow-strong);
+}
+
+.pro-metric-tile.cyan {
+  --pro-glow: rgba(21,231,255,.18);
+  --pro-glow-strong: rgba(21,231,255,.40);
+  --pro-line: linear-gradient(90deg, transparent, var(--cyan), transparent);
+}
+
+.pro-metric-tile.gold {
+  --pro-glow: rgba(255,214,107,.20);
+  --pro-glow-strong: rgba(255,214,107,.42);
+  --pro-line: linear-gradient(90deg, transparent, var(--gold), transparent);
+}
+
+.pro-metric-tile.purple {
+  --pro-glow: rgba(159,92,255,.22);
+  --pro-glow-strong: rgba(159,92,255,.42);
+  --pro-line: linear-gradient(90deg, transparent, var(--purple), transparent);
+}
+
+.pro-metric-tile.green {
+  --pro-glow: rgba(133,215,19,.18);
+  --pro-glow-strong: rgba(133,215,19,.38);
+  --pro-line: linear-gradient(90deg, transparent, var(--green), transparent);
+}
+
+.pro-metric-tile span {
+  display: block;
+  color: rgba(248,251,255,.66);
+  font-size: 12px;
+  font-weight: 900;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+
+.pro-metric-tile strong {
+  display: block;
+  margin: 12px 0 10px;
+  color: #ffffff;
+  font-size: clamp(26px, 2.7vw, 42px);
+  line-height: .92;
+  letter-spacing: -1.7px;
+  font-weight: 900;
+  text-shadow: 0 0 22px rgba(255,255,255,.12);
+  overflow-wrap: anywhere;
+}
+
+.pro-metric-tile p {
+  margin: 0;
+  color: rgba(248,251,255,.74);
+  font-size: 12px;
+  line-height: 1.45;
+}
+
+.pro-metric-tile small {
+  display: block;
+  margin-top: 10px;
+  color: rgba(248,251,255,.42);
+  font-size: 10px;
+  line-height: 1.35;
+  overflow-wrap: anywhere;
+}
+
+.pro-landing-shell {
+  max-width: 1280px;
+}
+
+.landing-brand-row span {
+  display: block;
+  margin-top: 4px;
+  color: rgba(248,251,255,.62);
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+
+.pro-landing-hero {
+  grid-template-columns: minmax(0, 1.25fr) minmax(340px, .75fr);
+}
+
+.pro-preview-card {
+  min-height: 430px;
+}
+
+.pro-preview-metrics {
+  display: grid;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.pro-preview-metrics div {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 13px;
+  border-radius: 16px;
+  border: 1px solid rgba(255,255,255,.10);
+  background: rgba(0,0,0,.18);
+}
+
+.pro-preview-metrics span {
+  color: rgba(248,251,255,.62);
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.pro-preview-metrics b {
+  color: #ffffff;
+  font-size: 15px;
+  font-weight: 900;
+}
+
+.pro-bottom-strip {
+  grid-template-columns: repeat(6, auto);
+}
+
+@media (max-width: 1340px) {
+  .pro-metric-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 1180px) {
+  .pro-landing-hero {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 680px) {
+  .brand h1 {
+    font-size: 52px;
+    letter-spacing: -2.8px;
+  }
+
+  .brand::after {
+    display: none;
+  }
+
+  .pro-metrics-head,
+  .pro-metric-grid,
+  .pro-bottom-strip {
+    grid-template-columns: 1fr;
+  }
+
+  .pro-metrics-head {
+    display: grid;
+  }
+
+  .pro-metrics-head > span {
+    max-width: none;
+    text-align: left;
+  }
+}
